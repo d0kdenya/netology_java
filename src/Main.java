@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class Main {
@@ -48,6 +49,13 @@ public class Main {
         zipFiles(zipFilePath, filesToZip);
 
 //        deleteFiles(filesToZip);
+
+        openZip(zipFilePath, "D:/Portfolio/java-dz/src/Games/savegames/");
+
+        GameProgress progress = openProgress("D:/Portfolio/java-dz/src/Games/savegames/save1.dat");
+        if (progress != null) {
+            System.out.println(progress);
+        }
     }
 
     private static void createDir(String path, StringBuilder log) {
@@ -125,5 +133,45 @@ public class Main {
                 System.out.println("Failed to delete file: " + filePath);
             }
         }
+    }
+
+    private static void openZip(String zipFilePath, String outputFolder) {
+        File dir = new File(outputFolder);
+        if (!dir.exists()) dir.mkdirs();
+
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFilePath))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                File newFile = new File(outputFolder, zipEntry.getName());
+                if (zipEntry.isDirectory()) {
+                    newFile.mkdirs();
+                } else {
+                    new File(newFile.getParent()).mkdirs();
+                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                        byte[] buffer = new byte[1024];
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                    }
+                }
+                zis.closeEntry();
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+        } catch (IOException e) {
+            System.out.println("Error extracting zip file: " + e.getMessage());
+        }
+    }
+
+    private static GameProgress openProgress(String saveFilePath) {
+        GameProgress gameProgress = null;
+        try (FileInputStream fis = new FileInputStream(saveFilePath);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            gameProgress = (GameProgress) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error reading game progress: " + e.getMessage());
+        }
+        return gameProgress;
     }
 }
