@@ -1,0 +1,12 @@
+Directory created: D:\Portfolio\java-dz/src/Games/src
+Directory created: D:\Portfolio\java-dz/src/Games/res
+Directory created: D:\Portfolio\java-dz/src/Games/savegames
+Directory created: D:\Portfolio\java-dz/src/Games/temp
+Directory created: D:\Portfolio\java-dz/src/Games/src/main
+Directory created: D:\Portfolio\java-dz/src/Games/src/test
+Directory created: D:\Portfolio\java-dz/src/Games/res/drawables
+Directory created: D:\Portfolio\java-dz/src/Games/res/vectors
+Directory created: D:\Portfolio\java-dz/src/Games/res/icons
+File created: D:\Portfolio\java-dz/src/Games/src/main/Main.java
+File created: D:\Portfolio\java-dz/src/Games/src/main/Utils.java
+File created: D:\Portfolio\java-dz/src/Games/temp/temp.txt
