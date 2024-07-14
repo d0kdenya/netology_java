@@ -1,6 +1,7 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class Main {
     public static void main(String[] args) {
@@ -29,6 +30,24 @@ public class Main {
         createFile(projectDir + "/Games/temp/temp.txt", log);
 
         writeLog(projectDir + "/Games/temp/temp.txt", log);
+
+        GameProgress progress1 = new GameProgress(100, 2, 10, 15.5);
+        GameProgress progress2 = new GameProgress(80, 3, 12, 20.0);
+        GameProgress progress3 = new GameProgress(50, 5, 15, 25.5);
+
+        String savePath1 = "D:/Portfolio/java-dz/src/Games/savegames/save1.dat";
+        String savePath2 = "D:/Portfolio/java-dz/src/Games/savegames/save2.dat";
+        String savePath3 = "D:/Portfolio/java-dz/src/Games/savegames/save3.dat";
+
+        saveGame(savePath1, progress1);
+        saveGame(savePath2, progress2);
+        saveGame(savePath3, progress3);
+
+        List<String> filesToZip = List.of(savePath1, savePath2, savePath3);
+        String zipFilePath = "D:/Portfolio/java-dz/src/Games/savegames/saves.zip";
+        zipFiles(zipFilePath, filesToZip);
+
+//        deleteFiles(filesToZip);
     }
 
     private static void createDir(String path, StringBuilder log) {
@@ -60,6 +79,51 @@ public class Main {
             writer.write(log.toString());
         } catch (IOException e) {
             System.out.println("Error writing log to file: " + e.getMessage());
+        }
+    }
+
+    private static void saveGame(String filePath, GameProgress gameProgress) {
+        try (FileOutputStream fos = new FileOutputStream(filePath);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(gameProgress);
+        } catch (IOException e) {
+            System.out.println("Filed to save game progress: " + e.getMessage());
+        }
+    }
+
+    private static void zipFiles(String zipFilesPath, List<String> filePaths) {
+        try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilesPath))) {
+            for (String filePath : filePaths) {
+                try (FileInputStream fis = new FileInputStream(filePath)) {
+                    ZipEntry zipEntry = new ZipEntry(new File(filePath).getName());
+                    zos.putNextEntry(zipEntry);
+
+                    byte[] buffer = new byte[1024];
+                    int length;
+
+                    while ((length = fis.read(buffer)) >= 0) {
+                        zos.write(buffer, 0, length);
+                    }
+
+                    zos.closeEntry();
+                } catch (IOException e) {
+                    System.out.println("Failed to add file to zip: " + e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to create zip file: " + e.getMessage());
+        }
+    }
+
+    private static void deleteFiles(List<String> filePaths) {
+        for (String filePath : filePaths) {
+            File file = new File(filePath);
+
+            if (file.delete()) {
+                System.out.println("Deleted file: " + filePath);
+            } else {
+                System.out.println("Failed to delete file: " + filePath);
+            }
         }
     }
 }
